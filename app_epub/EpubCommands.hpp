@@ -9,6 +9,7 @@
 #include "../app_utils/UtilsJString.hpp"
 
 #include "EpubBasic.hpp"
+#include "EpubCommandsBasic.hpp"
 
 namespace app::epub
 {
@@ -16,13 +17,8 @@ namespace app::epub
 class Commands : public Basic
 {
 protected:
-    template<Jsize _size>
-    using JString = app::utils::JString<_size>;
+    using CommandsResults = void (*)(void *p, CommandKey &key, CommandValue &value);
 
-    constexpr static Jint COMMANDS_KEY_SIZE = 64;
-    constexpr static Jint COMMANDS_VALUE_SIZE = 64;
-
-    using CommandsResults = void (*)(void *p, JString<COMMANDS_KEY_SIZE> &key, JString<COMMANDS_VALUE_SIZE> &value);
 public:
     Commands() :
         mResultP{},

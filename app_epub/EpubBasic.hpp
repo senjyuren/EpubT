@@ -5,7 +5,7 @@
 
 #include "../Kernel.hpp"
 
-#include "../app_utils/UtilsJString.hpp"
+#include "EpubCommandsBasic.hpp"
 
 namespace app::epub
 {
@@ -13,16 +13,12 @@ namespace app::epub
 class Basic
 {
 protected:
-    template<Jsize _size>
-    using JString = app::utils::JString<_size>;
-
-    constexpr static Jsize EPUBBASIC_COMMAND_SIZE = 64;
     constexpr static Jsize EPUBBASIC_COMMANDS_SIZE = 1024;
 
     typedef struct BasicCommands
     {
-        JString<EPUBBASIC_COMMAND_SIZE> key;
-        JString<EPUBBASIC_COMMAND_SIZE> value;
+        CommandKey key;
+        CommandValue value;
 
         BasicCommands() :
             key{},

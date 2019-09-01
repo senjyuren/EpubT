@@ -43,6 +43,8 @@ private:
     Factory() :
         mCommands{}
     {}
+
+    ~Factory() = default;
 };
 
 }
