@@ -154,7 +154,7 @@ public:
     {
         this->mLength = 0;
         memset(this->mCache, 0, sizeof(this->mCache));
-        return 0;
+        return (*this);
     }
 
     Jsize GetSize()

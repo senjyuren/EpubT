@@ -54,6 +54,7 @@ public:
     template<LogType _type, Jsize _size, typename... Args>
     Log &Output(JString<_size> &v, Args... args)
     {
+        this->mLog.Clean();
         this->mLog.Format(v, args...);
         this->TimeFormat();
         if (_type == LogType::INFO)
@@ -85,6 +86,7 @@ private:
 
         (*localNowTime).tm_year += 1900;
         ++(*localNowTime).tm_mon;
+        this->mTime.Clean();
         this->mTime.Format<sizeof(LOG_TIME_FORMAT)>(
             LOG_TIME_FORMAT,
             (*localNowTime).tm_year,
