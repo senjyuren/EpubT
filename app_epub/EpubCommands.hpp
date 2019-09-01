@@ -41,7 +41,7 @@ public:
         if (this->mResultsListen == nullptr)
             return;
         for (i = 0; i < this->mCommandsSize; ++i)
-            this->mResultsListen(this->mResultP, this->mCommands[i].key, this->mCommands[i].value);
+            this->mResultsListen(this->mResultP, this->mCommands[i].GetKey(), this->mCommands[i].GetValue());
     }
 
 private:

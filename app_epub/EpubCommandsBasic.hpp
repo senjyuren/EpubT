@@ -30,6 +30,36 @@ public:
     ~CommandValue() = default;
 };
 
+class CommandsPair
+{
+public:
+    CommandsPair() :
+        mKey{},
+        mValue{}
+    {}
+
+    ~CommandsPair() = default;
+
+    CommandsPair(CommandKey key, CommandValue value) :
+        mKey{key},
+        mValue{value}
+    {}
+
+    CommandKey &GetKey()
+    {
+        return this->mKey;
+    }
+
+    CommandValue &GetValue()
+    {
+        return this->mValue;
+    }
+
+private:
+    CommandKey mKey;
+    CommandValue mValue;
+};
+
 }
 
 #endif //CXXEPUB_EPUBCOMMANDSBASIC_HPP

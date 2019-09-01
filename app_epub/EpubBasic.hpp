@@ -15,17 +15,6 @@ class Basic
 protected:
     constexpr static Jsize EPUBBASIC_COMMANDS_SIZE = 1024;
 
-    typedef struct BasicCommands
-    {
-        CommandKey key;
-        CommandValue value;
-
-        BasicCommands() :
-            key{},
-            value{}
-        {}
-    } BasicCommands;
-
     constexpr static Jchar EPUBBASIC_COMMANDS_KEY_MARK = '-';
     constexpr static Jchar EPUBBASIC_COMMANDS_VALUE_MARK = '=';
 
@@ -60,8 +49,7 @@ public:
             auto &&position = positionPtr - &v[i][0];
             v[i][position] = 0x00;
             ++position;
-            this->mCommands[this->mCommandsSize].key = &v[i][1];
-            this->mCommands[this->mCommandsSize].value = &v[i][position];
+            this->mCommands[this->mCommandsSize] = CommandsPair(&v[i][1], &v[i][position]);
             ++this->mCommandsSize;
         }
     }
@@ -74,7 +62,7 @@ public:
 
 protected:
     Jint mCommandsSize;
-    BasicCommands mCommands[EPUBBASIC_COMMANDS_SIZE];
+    CommandsPair mCommands[EPUBBASIC_COMMANDS_SIZE];
 };
 
 }
