@@ -11,13 +11,8 @@ using app::utils::LogType;
 
 int main(Jint argLen, Jchar *arg[])
 {
-    Commands commands = reinterpret_cast<Commands &>(Factory::Instance().Get<FactoryType::COMMANDS>());
+    auto commands = reinterpret_cast<Commands &>(Factory::Instance().Get<FactoryType::COMMANDS>());
     commands.SetCommands(arg, argLen);
-    commands.SetResultsListener(nullptr, [](void *, CommandKey &k, CommandValue &v) {
-        if (!k.Equals(v))
-            Log::Print<LogType::DBUG>("key: %s, value: %s", k.GetArray(), v.GetArray());
-        else
-            Log::Print<LogType::DBUG>("fuckman");
-    }).Run();
+    commands.Run();
     return 0;
 }

@@ -44,12 +44,17 @@ public:
 
             auto &&positionPtr = reinterpret_cast<Jchar *>(memchr(&v[i][1], EPUBBASIC_COMMANDS_VALUE_MARK, commandLen));
             if (positionPtr == nullptr)
+            {
+                this->mCommands[this->mCommandsSize].SetKey(&v[i][1]);
+                ++this->mCommandsSize;
                 continue;
+            }
 
             auto &&position = positionPtr - &v[i][0];
             v[i][position] = 0x00;
             ++position;
-            this->mCommands[this->mCommandsSize] = CommandsPair(&v[i][1], &v[i][position]);
+            this->mCommands[this->mCommandsSize].SetKey(&v[i][1])
+                .SetValue(&v[i][position]);
             ++this->mCommandsSize;
         }
     }

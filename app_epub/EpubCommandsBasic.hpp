@@ -40,10 +40,17 @@ public:
 
     ~CommandsPair() = default;
 
-    CommandsPair(CommandKey key, CommandValue value) :
-        mKey{key},
-        mValue{value}
-    {}
+    CommandsPair &SetKey(const CommandKey &key)
+    {
+        this->mKey = key;
+        return (*this);
+    }
+
+    CommandsPair &SetValue(const CommandValue &value)
+    {
+        this->mValue = value;
+        return (*this);
+    }
 
     CommandKey &GetKey()
     {

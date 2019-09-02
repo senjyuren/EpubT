@@ -13,7 +13,7 @@ namespace app::utils
 template<Jsize _BufSize>
 class JString : public JByteArrayBasic<_BufSize>
 {
-protected:
+private:
     constexpr static Jsize JSTRING_DEFAULT_SIZE = 64;
 
 public:
@@ -69,6 +69,22 @@ public:
         return (*this);
     }
 
+    template<typename...Args>
+    JString &Format(const Jchar *v, Args... args)
+    {
+        if (v == nullptr)
+            return (*this);
+
+        auto &&tmpLen = _BufSize - this->mLength;
+        this->mLength += snprintf(
+            reinterpret_cast<Jchar *>(&this->mCache[this->mLength]),
+            tmpLen,
+            v,
+            args...
+        );
+        return (*this);
+    }
+
     template<Jsize _size>
     Jbool Equals(JString<_size> &v)
     {
@@ -89,6 +105,7 @@ public:
     {
         return this->Equals<JSTRING_DEFAULT_SIZE>(v);
     }
+
 };
 
 }

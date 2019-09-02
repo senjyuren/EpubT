@@ -157,6 +157,11 @@ public:
         return (*this);
     }
 
+    Jbool IsEmpty()
+    {
+        return (this->mLength == 0);
+    }
+
     Jsize GetSize()
     {
         return _BufSize;

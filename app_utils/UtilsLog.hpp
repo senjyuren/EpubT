@@ -17,12 +17,20 @@ enum class LogType
     INFO,
 };
 
+enum class LogLevelType
+{
+    LEVEL_1,
+    LEVEL_2,
+    LEVEL_3,
+};
+
 class Log
 {
-protected:
+private:
     constexpr static Jsize LOG_SIZE = 4096;
     constexpr static Jsize LOG_TAG_SIZE = 32;
     constexpr static Jsize LOG_TIME_SIZE = 32;
+    constexpr static Jsize LOG_SPLITS_SYMBOL_SIZE = 64;
 
     constexpr static Jchar LOG_DEFAULT_TAG[] = "Tools";
     constexpr static Jchar LOG_TIME_FORMAT[] = "%04d-%02d-%02d %02d:%02d:%02d";
@@ -30,19 +38,17 @@ protected:
     constexpr static Jchar LOG_LEVEL_DBUG_FORMAT[] = "[%s][DBUG][%s][%s]\r\n";
     constexpr static Jchar LOG_LEVEL_ERRO_FORMAT[] = "[%s][ERRO][%s][%s]\r\n";
 
-public:
+    constexpr static Jchar LOG_SPLITS_SYMBOL = '-';
+    constexpr static Jchar LOG_SPLITS_LEVEL_1_FORMAT[] = "  %s\r\n";
+    constexpr static Jchar LOG_SPLITS_LEVEL_2_FORMAT[] = "    %s\r\n";
+    constexpr static Jchar LOG_SPLITS_LEVEL_3_FORMAT[] = "      %s\r\n";
+
     static Log &Instance()
     {
         static Log *obj = nullptr;
         if (obj == nullptr)
             obj = new Log();
         return (*obj);
-    }
-
-    template<LogType _type, typename... Args>
-    static void Print(JString<LOG_SIZE> v, Args...args)
-    {
-        Log::Instance().Output<_type>(v, args...);
     }
 
     Log &SetTag(JString<LOG_TAG_SIZE> v)
@@ -66,7 +72,14 @@ public:
         return (*this);
     }
 
-private:
+public:
+    template<LogType _type, typename... Args>
+    static void Print(JString<LOG_SIZE> v, Args...args)
+    {
+        Log::Instance().Output<_type>(v, args...);
+    }
+
+protected:
     JString<LOG_SIZE> mLog;
     JString<LOG_TAG_SIZE> mTag;
     JString<LOG_TIME_SIZE> mTime;
@@ -126,6 +139,26 @@ private:
             this->mTime.GetArray(),
             this->mLog.GetArray()
         );
+    }
+
+    void Splits()
+    {
+        for (Jsize i = 0; i < LOG_SPLITS_SYMBOL_SIZE; ++i)
+            printf("%c", LOG_SPLITS_SYMBOL);
+        printf("\r\n");
+    }
+
+    template<LogLevelType _type = LogLevelType::LEVEL_1, typename...Args>
+    void OutputFormat(const Jchar *v, Args...args)
+    {
+        this->mLog.Clean();
+        this->mLog.Format(v, args...);
+        if (_type == LogLevelType::LEVEL_1)
+            printf(LOG_SPLITS_LEVEL_1_FORMAT, this->mLog.GetArray());
+        else if (_type == LogLevelType::LEVEL_2)
+            printf(LOG_SPLITS_LEVEL_2_FORMAT, this->mLog.GetArray());
+        else if (_type == LogLevelType::LEVEL_3)
+            printf(LOG_SPLITS_LEVEL_3_FORMAT, this->mLog.GetArray());
     }
 };
 
