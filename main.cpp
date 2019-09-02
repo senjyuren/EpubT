@@ -12,7 +12,6 @@ using app::utils::LogType;
 int main(Jint argLen, Jchar *arg[])
 {
     auto commands = reinterpret_cast<Commands &>(Factory::Instance().Get<FactoryType::COMMANDS>());
-    commands.SetCommands(arg, argLen);
-    commands.Run();
+    commands.SetCommands(arg, argLen).Run();
     return 0;
 }

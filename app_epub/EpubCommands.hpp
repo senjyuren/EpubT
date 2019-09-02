@@ -25,6 +25,12 @@ public:
 
     ~Commands() = default;
 
+    Commands &SetCommands(Jchar **v, Jsize vLen) override
+    {
+        Basic::SetCommands(v, vLen);
+        return (*this);
+    }
+
     void Run()
     {
         auto &&collection = new CommandsHelp();

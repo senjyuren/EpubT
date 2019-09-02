@@ -5,6 +5,7 @@
 
 #include "../Kernel.hpp"
 
+#include "EpubArticle.hpp"
 #include "EpubCommands.hpp"
 
 namespace app::epub
@@ -12,6 +13,7 @@ namespace app::epub
 
 enum class FactoryType
 {
+    ARTICLE,
     COMMANDS,
 };
 
@@ -34,13 +36,20 @@ public:
             if (this->mCommands == nullptr)
                 this->mCommands = new Commands();
             return (*this->mCommands);
+        } else if (_type == FactoryType::ARTICLE)
+        {
+            if (this->mArticle == nullptr)
+                this->mArticle = new Article();
+            return (*this->mArticle);
         }
     }
 
 private:
+    Basic *mArticle;
     Basic *mCommands;
 
     Factory() :
+        mArticle{},
         mCommands{}
     {}
 

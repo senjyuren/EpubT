@@ -5,6 +5,8 @@
 
 #include "../Kernel.hpp"
 
+#include "EpubArticleBasic.hpp"
+#include "EpubArticleCollection.hpp"
 #include "EpubCommandsBasic.hpp"
 
 namespace app::epub
@@ -12,7 +14,7 @@ namespace app::epub
 
 class Basic
 {
-protected:
+private:
     constexpr static Jsize EPUBBASIC_COMMANDS_SIZE = 1024;
 
     constexpr static Jchar EPUBBASIC_COMMANDS_KEY_MARK = '-';
@@ -21,17 +23,20 @@ protected:
 public:
     Basic() :
         mCommandsSize{},
-        mCommands{}
+        mCommands{},
+        mArticleWriter{},
+        mArticlePartStorage{},
+        mArticleTitleStorage{}
     {}
 
     ~Basic() = default;
 
-    void SetCommands(Jchar **v, Jsize vLen)
+    virtual Basic &SetCommands(Jchar **v, Jsize vLen)
     {
         Jint i = 0;
 
         if ((v == nullptr) || (vLen < 2))
-            return;
+            return (*this);
 
         for (i = 1; i < static_cast<Jint>(vLen); ++i)
         {
@@ -57,17 +62,53 @@ public:
                 .SetValue(&v[i][position]);
             ++this->mCommandsSize;
         }
+
+        return (*this);
+    }
+
+    virtual Basic &SetArticleStart()
+    {
+        this->mArticleWriter.Register(&this->mArticlePartStorage);
+        this->mArticleWriter.Register(&this->mArticlePartStorage);
+        return (*this);
+    }
+
+    virtual Basic &SetArticleTitle(ArticleTitle &v)
+    {
+        this->mArticleWriter.SetTitle<ArticleType::TITLE>(v);
+        return (*this);
+    }
+
+    virtual Basic &SetArticlePart(Jbool isNew, ArticlePart &v)
+    {
+        if (isNew)
+            this->mArticleWriter.SetPart<true, ArticleType::PART>(v);
+        else
+            this->mArticleWriter.SetPart<false, ArticleType::PART>(v);
+        return (*this);
+    }
+
+    virtual Basic &ArticleFinish()
+    {
+        this->mArticleWriter.Finish();
+        return (*this);
     }
 
     void Clean()
     {
         this->mCommandsSize = 0;
         memset(&this->mCommands, 0, sizeof(this->mCommands));
+        this->mArticleWriter.UnRegister(&this->mArticlePartStorage);
+        this->mArticleWriter.UnRegister(&this->mArticleTitleStorage);
     }
 
 protected:
     Jint mCommandsSize;
     CommandsPair mCommands[EPUBBASIC_COMMANDS_SIZE];
+
+    ArticleWriter mArticleWriter;
+    ArticlePartStorage mArticlePartStorage;
+    ArticleTitleStorage mArticleTitleStorage;
 };
 
 }
