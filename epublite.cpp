@@ -68,6 +68,59 @@ protected:
     _Type mArray[_BufSize + 1];
 };
 
+template<typename _Type>
+class HeapTypeBase
+{
+public:
+    HeapTypeBase()
+        :mLength{}
+        ,mArray{}
+    {}
+
+    virtual ~HeapTypeBase()
+    {
+        if(this->mArray != nullptr)
+            delete[](this->mArray);
+        this->mLength = 0;
+        this->mArray = nullptr;
+    }
+
+protected:
+    Jint   mLength;
+    _Type *mArray;
+};
+
+template<typename _Type>
+class HeapType : public HeapTypeBase<_Type>
+{
+public:
+    using HeapTypeBase<_Type>::HeapTypeBase;
+
+    HeapType() = default;
+
+    ~HeapType() override = default;
+
+    explicit HeapType(Jsize v)
+    {
+        this->mLength = v;
+        this->mArray = new _Type[this->mLength + 1];
+    }
+
+    void Make(Jsize v)
+    {
+        if(this->mArray != nullptr)
+            delete[](this->mArray);
+
+        this->mLength = v;
+        this->mArray = new _Type[v];
+    }
+
+    Jint GetSize()
+    {
+        return this->mLength;
+    }
+};
+
 template<Jint _BufSize>
 class StringBase : public StackType<Jbyte,_BufSize>
 {
@@ -103,6 +156,21 @@ public:
     StringBase(StringBase<_size> &&v)
         :StringBase{reinterpret_cast<StringBase<_size> &>(v)}
     {}
+
+    StringBase &Append(Jchar v)
+    {
+        if(this->mLength > _BufSize)
+            return (*this);
+
+        this->mArray[this->mLength] = v;
+        ++this->mLength;
+        return (*this);
+    }
+
+    StringBase &Append(Jbyte v)
+    {
+        return this->Append(static_cast<Jchar>(v));
+    }
 
     StringBase &Append(const Jchar *v)
     {
@@ -211,10 +279,10 @@ public:
     ~FilePath() override = default;
 };
 
-enum FileMode
+enum class FileMode
 {
-    FILEMODE_READ  = 0x01,
-    FILEMODE_WRITE = 0x02,
+    READ,
+    WRITE,
 };
 
 class FileModeCmd : public lang::String<16>
@@ -237,11 +305,10 @@ public:
     ~FileRow() override = default;
 };
 
-template<Jint _BufSize>
-class FileRows : public lang::StackType<FileRow,_BufSize>
+class FileRows : public lang::HeapType<FileRow>
 {
 public:
-    using lang::StackType<FileRow,_BufSize>::StackType;
+    using lang::HeapType<FileRow>::HeapType;
 
     FileRows() = default;
 
@@ -249,18 +316,19 @@ public:
 
     FileRow &operator[](Jint i)
     {
+        if((this->mLength < 1) || (this->mArray == nullptr))
+            return this->mArray[this->mLength];
         if(i > this->mLength)
-            return this->mArray[_BufSize];
+            return this->mArray[this->mLength];
         return this->mArray[i];
     }
 };
 
-template<Jsize _BufSize>
 class FileBase
 {
 public:
     FileBase()
-        :isOpen{}
+        :mChar{}
         ,mRow{}
         ,mRows{}
         ,mPath{}
@@ -272,21 +340,20 @@ public:
     virtual ~FileBase() = default;
 
 protected:
-    Jbool              isOpen;
-    FileRow            mRow;
-    FileRows<_BufSize> mRows;
+    Jbyte        mChar;
+    FileRow      mRow;
+    FileRows     mRows;
 
-    FilePath           mPath;
-    FileMode           mMode;
-    FileModeCmd        mModeCmd;
-    FILE              *mHandle;
+    FilePath     mPath;
+    FileMode     mMode;
+    FileModeCmd  mModeCmd;
+    FILE        *mHandle;
 };
 
-template<Jint _BufSize>
-class File : public FileBase<_BufSize>
+class File : public FileBase
 {
 public:
-    using FileBase<_BufSize>::FileBase;
+    using FileBase::FileBase;
 
     File() = default;
 
@@ -325,33 +392,87 @@ public:
 
     Jbool Open()
     {
-        this->isOpen = (this->mHandle = fopen(this->mPath.GetString(),this->mModeCmd.GetString())) == nullptr;
-        return this->isOpen;
+        return ((this->mHandle = fopen(this->mPath.GetString(),this->mModeCmd.GetString())) != nullptr);
     }
     
-    File &SetMode(enum FileMode mode)
+    File &SetMode(FileMode mode)
     {
-        if((mode & FILEMODE_READ) == FILEMODE_READ)
-            this->mModeCmd.Append("r");
-        if((mode & FILEMODE_WRITE) == FILEMODE_WRITE)
-            this->mModeCmd.Append("w");
+        if(mode == FileMode::READ)
+            this->mModeCmd.Append("rb");
+        else if(mode == FileMode::WRITE)
+            this->mModeCmd.Append("wb+");
         return (*this);
     }
 
     FileRow &ReadRow()
     {
-        return this->nRow;
+        Jint ret = 0;
+        Jbool mark = false;
+
+        this->mRow.Clean();
+        if(this->mHandle == nullptr)
+            return this->mRow;
+        
+        do
+        {
+            ret = fread(&this->mChar,1,1,this->mHandle);
+            if((this->mChar != 0x0A) && (this->mChar != 0x0D))
+                this->mRow.Append(this->mChar);
+            else
+                mark = this->mChar == 0x0A;
+
+            if(mark)
+            {
+                if(ret = fread(&this->mChar,1,1,this->mHandle);ret < 1)
+                    break;
+                if(this->mChar != 0x0D)
+                    fseek(this->mHandle,-1,SEEK_CUR);
+            }
+        }while((ret > 0) && (!mark));
+        return this->mRow;
     }
 
-    File &WriteRow()
+    File &WriteRow(FileRow &v)
+    {
+        return this->WriteRow(reinterpret_cast<FileRow &&>(v));
+    }
+
+    File &WriteRow(FileRow &&)
     {
         return (*this);
     }
 
-    FileRows<_BufSize> &ReadRows()
+    FileRows &ReadRows()
     {
         return this->mRows;
     }
 };
 
+}
+
+Jint main()
+{
+    using feature::File;
+    using feature::FilePath;
+    using feature::FileMode;
+
+    FilePath localFile = "F:\\2620.txt";
+    File localFileHandle{localFile};
+
+    do
+    {
+        localFileHandle.SetMode(FileMode::READ);
+        if(!localFileHandle.Open())
+            break;
+        
+        auto &&oneRow = localFileHandle.ReadRow();
+        printf("%s\r\n",oneRow.GetString());
+        
+        auto &&twoRow = localFileHandle.ReadRow();
+        printf("%s\r\n",twoRow.GetString());
+        
+        auto &&threeRow = localFileHandle.ReadRow();
+        printf("%s\r\n",threeRow.GetString());
+    }while(false);
+    return 0;
 }
