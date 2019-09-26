@@ -59,6 +59,10 @@ private:
         {{{.mValue = DefineValueType::XHTML}, "xhtml"},
          {{.mValue = DefineValueType::SPLIT}, "split"},};
 
+    Define() = default;
+
+    ~Define() = default;
+
 public:
     static DefineKeyType ConvKey(CommandKey &key)
     {
@@ -98,9 +102,11 @@ private:
         return (*obj);
     }
 
+    using Log::Log;
+
     DefineHelpGenerator() = default;
 
-    ~DefineHelpGenerator() = default;
+    ~DefineHelpGenerator() override = default;
 
 public:
     template<DefineKeyType _kt = DefineKeyType::HELP, DefineValueType _vt = DefineValueType::NONE>

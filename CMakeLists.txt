@@ -16,7 +16,7 @@ ELSEIF (SJR_OS_LINUX)
 
     SET(CMAKE_STATIC_LINKER_FLAGS "${SYSTEM_LIB}")
 ELSEIF (SJR_OS_WINDOWS)
-    ADD_DEFINITIONS(-Werror -Wall -Wextra -Wno-format-security)
+#    ADD_DEFINITIONS(-Werror -Wall -Wextra -Wno-format-security)
     ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
     ADD_DEFINITIONS(-D_OS_WINDOWS)
 

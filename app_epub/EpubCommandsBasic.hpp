@@ -17,7 +17,7 @@ public:
 
     CommandKey() = default;
 
-    ~CommandKey() = default;
+    ~CommandKey() override = default;
 };
 
 class CommandValue : public app::utils::JString<64>
@@ -27,7 +27,7 @@ public:
 
     CommandValue() = default;
 
-    ~CommandValue() = default;
+    ~CommandValue() override = default;
 };
 
 class CommandsPair
@@ -38,7 +38,7 @@ public:
         mValue{}
     {}
 
-    ~CommandsPair() = default;
+    virtual ~CommandsPair() = default;
 
     CommandsPair &SetKey(const CommandKey &key)
     {

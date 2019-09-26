@@ -17,7 +17,7 @@ public:
         mCache{}
     {}
 
-    ~JByteArrayBasic() = default;
+    virtual ~JByteArrayBasic() = default;
 
     explicit JByteArrayBasic(Jchar v) :
         mLength{},

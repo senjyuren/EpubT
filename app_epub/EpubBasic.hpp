@@ -29,7 +29,7 @@ public:
         mArticleTitleStorage{}
     {}
 
-    ~Basic() = default;
+    virtual ~Basic() = default;
 
     virtual Basic &SetCommands(Jchar **v, Jsize vLen)
     {
@@ -97,7 +97,6 @@ public:
     void Clean()
     {
         this->mCommandsSize = 0;
-        memset(&this->mCommands, 0, sizeof(this->mCommands));
         this->mArticleWriter.UnRegister(&this->mArticlePartStorage);
         this->mArticleWriter.UnRegister(&this->mArticleTitleStorage);
     }

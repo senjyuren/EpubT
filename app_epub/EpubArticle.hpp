@@ -12,26 +12,49 @@ namespace app::epub
 
 class Article : public Basic
 {
+private:
+
+
 public:
+    using Basic::Basic;
+
     Article() :
-        mPath{}
+        mPath{},
+        mSymbol{}
     {}
 
-    ~Article() = default;
+    ~Article() override = default;
 
-    Article &SetFilePath(CommandValue &value)
+    Article &SetFilePath(ArticlePath &value)
     {
         this->mPath = value;
         return (*this);
     }
 
-    void Run()
+    Article &SetDirctoryPath(ArticlePath &value)
     {
-        
+        this->mDirctory = value;
+        return (*this);
+    }
+
+    Article &SetSplitSymbol(ArticleSplitSymbol &v)
+    {
+        this->mSymbol = v;
+        return (*this);
+    }
+
+    Article &Parse()
+    {
+        if ((this->mPath.IsExist()) || (this->mDirctory.IsDirctory()))
+            return (*this);
+
+        return (*this);
     }
 
 private:
-    CommandValue mPath;
+    ArticlePath mPath;
+    ArticlePath mDirctory;
+    ArticleSplitSymbol mSymbol;
 };
 
 }

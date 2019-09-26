@@ -36,7 +36,7 @@ private:
 
     Property() = default;
 
-    ~Property() = default;
+    virtual ~Property() = default;
 
     template<PropertyType _type>
     JString<PROPERTY_SIZE> GetValue()

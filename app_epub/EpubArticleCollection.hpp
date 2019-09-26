@@ -54,6 +54,8 @@ private:
     constexpr static Jsize ArticleWriter_DEFAULT_SIZE = 40960;
 
 public:
+    using ArticleSubject::ArticleSubject;
+
     ArticleWriter() :
         isNew{},
         mType{},
@@ -175,6 +177,8 @@ private:
     constexpr static Jchar ATRICLETITLESTORAGE_STORAGE_NAME[] = "storage_title_database";
 
 public:
+    using ArticleObserver::ArticleObserver;
+
     ArticleTitleStorage() :
         mStorage{}
     {}
@@ -212,6 +216,8 @@ private:
     constexpr static Jchar ATRICLEPARTSTORAGE_STORAGE_NAME[] = "storage_part_database_%d";
 
 public:
+    using ArticleObserver::ArticleObserver;
+
     ArticlePartStorage() :
         mStorage{},
         mTitleCount{},

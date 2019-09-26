@@ -21,7 +21,7 @@ public:
 
     JString() = default;
 
-    ~JString() = default;
+    ~JString() override = default;
 
     JString(const Jchar *v)
     {

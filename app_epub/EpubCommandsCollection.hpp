@@ -76,7 +76,6 @@ public:
             if (this->mObserver[i] != v)
                 continue;
 
-            delete (this->mObserver[i]);
             this->mObserver[i] = nullptr;
             break;
         }
@@ -130,7 +129,9 @@ private:
 class CommandsHelp : public CommandsObserver
 {
 public:
-    explicit CommandsHelp() = default;
+    using CommandsObserver::CommandsObserver;
+
+    CommandsHelp() = default;
 
     ~CommandsHelp() override = default;
 
@@ -159,6 +160,8 @@ private:
 class CommandsXhtml : public CommandsObserver
 {
 public:
+    using CommandsObserver::CommandsObserver;
+
     CommandsXhtml() :
         mHelp{},
         mHead{},
@@ -207,6 +210,8 @@ private:
 class CommandsSplit : public CommandsObserver
 {
 public:
+    using CommandsObserver::CommandsObserver;
+
     CommandsSplit() :
         mHelp{},
         mMode{},

@@ -73,6 +73,8 @@ private:
     }
 
 public:
+    virtual ~Log() = default;
+
     template<LogType _type, typename... Args>
     static void Print(JString<LOG_SIZE> v, Args...args)
     {

@@ -19,11 +19,13 @@ namespace app::epub
 class Commands : public Basic
 {
 public:
+    using Basic::Basic;
+
     Commands() :
         mHanlde{}
     {}
 
-    ~Commands() = default;
+    ~Commands() override = default;
 
     Commands &SetCommands(Jchar **v, Jsize vLen) override
     {
@@ -33,25 +35,25 @@ public:
 
     void Run()
     {
-        auto &&collection = new CommandsHelp();
-        auto &&xhtml = new CommandsXhtml();
-        auto &&split = new CommandsSplit();
-
-        this->mHanlde.Register(collection);
-        this->mHanlde.Register(xhtml);
-        this->mHanlde.Register(split);
+        this->mHanlde.Register(&this->mCmdHelp);
+        this->mHanlde.Register(&this->mCmdXhtml);
+        this->mHanlde.Register(&this->mCmdSplit);
 
         for (Jint i = 0; i < this->mCommandsSize; ++i)
             this->mHanlde.SetKeyAndValue(this->mCommands[i].GetKey(), this->mCommands[i].GetValue());
         this->mHanlde.Finish();
 
-        this->mHanlde.UnRegister(collection);
-        this->mHanlde.UnRegister(xhtml);
-        this->mHanlde.UnRegister(split);
+        this->mHanlde.UnRegister(&this->mCmdHelp);
+        this->mHanlde.UnRegister(&this->mCmdXhtml);
+        this->mHanlde.UnRegister(&this->mCmdSplit);
     }
 
 private:
     CommandsHandle mHanlde;
+
+    CommandsHelp mCmdHelp;
+    CommandsXhtml mCmdXhtml;
+    CommandsSplit mCmdSplit;
 };
 
 }
